@@ -34,9 +34,9 @@ Clique para abrir em tamanho real. A legenda da notação está no próprio diag
 
 | Símbolo | Significado |
 |---|---|
-| `——||` | exatamente **1** (obrigatório) |
-| `——o|` | **0 ou 1** (opcional) |
-| `——|{` | **1 ou muitos** (obrigatório) |
+| `——\|\|` | exatamente **1** (obrigatório) |
+| `——o\|` | **0 ou 1** (opcional) |
+| `——\|{` | **1 ou muitos** (obrigatório) |
 | `——o{` | **0 ou muitos** (opcional) |
 | **PK** / **FK** / **UK** | chave primária / estrangeira / única |
 
