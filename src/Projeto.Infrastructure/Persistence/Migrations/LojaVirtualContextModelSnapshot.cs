@@ -40,6 +40,20 @@ namespace Projeto.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Categorias", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("0b1d6c2e-5a1f-4c3a-9f10-000000000001"),
+                            Descricao = "Periféricos e acessórios de informática",
+                            Nome = "Eletrônicos"
+                        },
+                        new
+                        {
+                            Id = new Guid("0b1d6c2e-5a1f-4c3a-9f10-000000000002"),
+                            Descricao = "Livros impressos e digitais",
+                            Nome = "Livros e E-books"
+                        });
                 });
 
             modelBuilder.Entity("Projeto.Domain.Entities.Cliente", b =>
@@ -273,6 +287,11 @@ namespace Projeto.Infrastructure.Persistence.Migrations
                         .HasPrecision(10, 2)
                         .HasColumnType("decimal(10,2)");
 
+                    b.Property<string>("TipoProduto")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoriaId");
@@ -282,9 +301,116 @@ namespace Projeto.Infrastructure.Persistence.Migrations
 
                     b.ToTable("Produtos", null, t =>
                         {
+                            t.HasCheckConstraint("CK_Produtos_Digital", "TipoProduto <> 'Digital' OR (UrlDownload IS NOT NULL AND TamanhoArquivoMb IS NOT NULL)");
+
                             t.HasCheckConstraint("CK_Produtos_EstoqueAtual", "EstoqueAtual >= 0");
 
+                            t.HasCheckConstraint("CK_Produtos_Fisico", "TipoProduto <> 'Fisico' OR (PesoGramas IS NOT NULL AND AlturaCm IS NOT NULL AND LarguraCm IS NOT NULL AND ComprimentoCm IS NOT NULL)");
+
                             t.HasCheckConstraint("CK_Produtos_Preco", "Preco >= 0");
+
+                            t.HasCheckConstraint("CK_Produtos_TipoProduto", "TipoProduto IN ('Fisico', 'Digital')");
+                        });
+
+                    b.HasDiscriminator<string>("TipoProduto").HasValue("Produto");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Projeto.Domain.Entities.ProdutoDigital", b =>
+                {
+                    b.HasBaseType("Projeto.Domain.Entities.Produto");
+
+                    b.Property<int?>("LimiteDownloads")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("TamanhoArquivoMb")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("decimal(10,2)");
+
+                    b.Property<string>("UrlDownload")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("varchar(300)");
+
+                    b.ToTable(t =>
+                        {
+                            t.HasCheckConstraint("CK_Produtos_Digital", "TipoProduto <> 'Digital' OR (UrlDownload IS NOT NULL AND TamanhoArquivoMb IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_Produtos_EstoqueAtual", "EstoqueAtual >= 0");
+
+                            t.HasCheckConstraint("CK_Produtos_Fisico", "TipoProduto <> 'Fisico' OR (PesoGramas IS NOT NULL AND AlturaCm IS NOT NULL AND LarguraCm IS NOT NULL AND ComprimentoCm IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_Produtos_Preco", "Preco >= 0");
+
+                            t.HasCheckConstraint("CK_Produtos_TipoProduto", "TipoProduto IN ('Fisico', 'Digital')");
+                        });
+
+                    b.HasDiscriminator().HasValue("Digital");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("5e7a9d4c-2b3f-4e8a-8c20-000000000002"),
+                            Ativo = true,
+                            CategoriaId = new Guid("0b1d6c2e-5a1f-4c3a-9f10-000000000002"),
+                            CodigoBarras = "9786500000011",
+                            Descricao = "E-book em PDF e EPUB",
+                            EstoqueAtual = 0,
+                            Nome = "E-book Clean Architecture na prática",
+                            Preco = 39.90m,
+                            LimiteDownloads = 3,
+                            TamanhoArquivoMb = 12.50m,
+                            UrlDownload = "https://loja.exemplo.com/downloads/ebook-clean-architecture"
+                        });
+                });
+
+            modelBuilder.Entity("Projeto.Domain.Entities.ProdutoFisico", b =>
+                {
+                    b.HasBaseType("Projeto.Domain.Entities.Produto");
+
+                    b.Property<int>("AlturaCm")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ComprimentoCm")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LarguraCm")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PesoGramas")
+                        .HasColumnType("int");
+
+                    b.ToTable(t =>
+                        {
+                            t.HasCheckConstraint("CK_Produtos_Digital", "TipoProduto <> 'Digital' OR (UrlDownload IS NOT NULL AND TamanhoArquivoMb IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_Produtos_EstoqueAtual", "EstoqueAtual >= 0");
+
+                            t.HasCheckConstraint("CK_Produtos_Fisico", "TipoProduto <> 'Fisico' OR (PesoGramas IS NOT NULL AND AlturaCm IS NOT NULL AND LarguraCm IS NOT NULL AND ComprimentoCm IS NOT NULL)");
+
+                            t.HasCheckConstraint("CK_Produtos_Preco", "Preco >= 0");
+
+                            t.HasCheckConstraint("CK_Produtos_TipoProduto", "TipoProduto IN ('Fisico', 'Digital')");
+                        });
+
+                    b.HasDiscriminator().HasValue("Fisico");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("5e7a9d4c-2b3f-4e8a-8c20-000000000001"),
+                            Ativo = true,
+                            CategoriaId = new Guid("0b1d6c2e-5a1f-4c3a-9f10-000000000001"),
+                            CodigoBarras = "7891000000017",
+                            Descricao = "Mouse óptico sem fio, 1600 DPI",
+                            EstoqueAtual = 25,
+                            Nome = "Mouse sem fio",
+                            Preco = 89.90m,
+                            AlturaCm = 4,
+                            ComprimentoCm = 11,
+                            LarguraCm = 7,
+                            PesoGramas = 95
                         });
                 });
 

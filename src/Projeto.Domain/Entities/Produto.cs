@@ -1,6 +1,10 @@
 namespace Projeto.Domain.Entities;
 
-public class Produto
+/// <summary>
+/// Classe base da hierarquia de produtos. E abstrata: todo produto vendido e
+/// fisico (<see cref="ProdutoFisico"/>) ou digital (<see cref="ProdutoDigital"/>).
+/// </summary>
+public abstract class Produto
 {
     public Guid Id { get; set; }
     public required string Nome { get; set; }

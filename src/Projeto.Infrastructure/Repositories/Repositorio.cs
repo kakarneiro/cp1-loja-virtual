@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Projeto.Application;
+using Projeto.Application.Repositories;
 using Projeto.Infrastructure.Persistence;
 
 namespace Projeto.Infrastructure.Repositories;
