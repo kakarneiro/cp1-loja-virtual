@@ -27,5 +27,20 @@ public class CategoriaConfiguration : IEntityTypeConfiguration<Categoria>
             .HasForeignKey(p => p.CategoriaId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Dados iniciais para o endpoint de verificacao.
+        builder.HasData(
+            new Categoria
+            {
+                Id = DadosIniciais.CategoriaEletronicosId,
+                Nome = "Eletrônicos",
+                Descricao = "Periféricos e acessórios de informática"
+            },
+            new Categoria
+            {
+                Id = DadosIniciais.CategoriaLivrosId,
+                Nome = "Livros e E-books",
+                Descricao = "Livros impressos e digitais"
+            });
     }
 }

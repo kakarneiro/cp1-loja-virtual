@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Projeto.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
@@ -58,13 +60,24 @@ namespace Projeto.Infrastructure.Persistence.Migrations
                     Preco = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
                     EstoqueAtual = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     Ativo = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true),
-                    CategoriaId = table.Column<Guid>(type: "char(36)", nullable: false)
+                    CategoriaId = table.Column<Guid>(type: "char(36)", nullable: false),
+                    TipoProduto = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false),
+                    UrlDownload = table.Column<string>(type: "varchar(300)", maxLength: 300, nullable: true),
+                    TamanhoArquivoMb = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: true),
+                    LimiteDownloads = table.Column<int>(type: "int", nullable: true),
+                    PesoGramas = table.Column<int>(type: "int", nullable: true),
+                    AlturaCm = table.Column<int>(type: "int", nullable: true),
+                    LarguraCm = table.Column<int>(type: "int", nullable: true),
+                    ComprimentoCm = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Produtos", x => x.Id);
+                    table.CheckConstraint("CK_Produtos_Digital", "TipoProduto <> 'Digital' OR (UrlDownload IS NOT NULL AND TamanhoArquivoMb IS NOT NULL)");
                     table.CheckConstraint("CK_Produtos_EstoqueAtual", "EstoqueAtual >= 0");
+                    table.CheckConstraint("CK_Produtos_Fisico", "TipoProduto <> 'Fisico' OR (PesoGramas IS NOT NULL AND AlturaCm IS NOT NULL AND LarguraCm IS NOT NULL AND ComprimentoCm IS NOT NULL)");
                     table.CheckConstraint("CK_Produtos_Preco", "Preco >= 0");
+                    table.CheckConstraint("CK_Produtos_TipoProduto", "TipoProduto IN ('Fisico', 'Digital')");
                     table.ForeignKey(
                         name: "FK_Produtos_Categorias_CategoriaId",
                         column: x => x.CategoriaId,
@@ -160,6 +173,25 @@ namespace Projeto.Infrastructure.Persistence.Migrations
                         onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.InsertData(
+                table: "Categorias",
+                columns: new[] { "Id", "Descricao", "Nome" },
+                values: new object[,]
+                {
+                    { new Guid("0b1d6c2e-5a1f-4c3a-9f10-000000000001"), "Periféricos e acessórios de informática", "Eletrônicos" },
+                    { new Guid("0b1d6c2e-5a1f-4c3a-9f10-000000000002"), "Livros impressos e digitais", "Livros e E-books" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Produtos",
+                columns: new[] { "Id", "AlturaCm", "Ativo", "CategoriaId", "CodigoBarras", "ComprimentoCm", "Descricao", "EstoqueAtual", "LarguraCm", "Nome", "PesoGramas", "Preco", "TipoProduto" },
+                values: new object[] { new Guid("5e7a9d4c-2b3f-4e8a-8c20-000000000001"), 4, true, new Guid("0b1d6c2e-5a1f-4c3a-9f10-000000000001"), "7891000000017", 11, "Mouse óptico sem fio, 1600 DPI", 25, 7, "Mouse sem fio", 95, 89.90m, "Fisico" });
+
+            migrationBuilder.InsertData(
+                table: "Produtos",
+                columns: new[] { "Id", "Ativo", "CategoriaId", "CodigoBarras", "Descricao", "LimiteDownloads", "Nome", "Preco", "TamanhoArquivoMb", "TipoProduto", "UrlDownload" },
+                values: new object[] { new Guid("5e7a9d4c-2b3f-4e8a-8c20-000000000002"), true, new Guid("0b1d6c2e-5a1f-4c3a-9f10-000000000002"), "9786500000011", "E-book em PDF e EPUB", 3, "E-book Clean Architecture na prática", 39.90m, 12.50m, "Digital", "https://loja.exemplo.com/downloads/ebook-clean-architecture" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categorias_Nome",

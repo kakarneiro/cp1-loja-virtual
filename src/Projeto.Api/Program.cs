@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Projeto.Application;
+using Projeto.Api.Endpoints;
+using Projeto.Application.Repositories;
 using Projeto.Infrastructure.Persistence;
 using Projeto.Infrastructure.Repositories;
 
@@ -20,5 +21,7 @@ builder.Services.AddDbContext<LojaVirtualContext>(options =>
 builder.Services.AddScoped(typeof(IRepositorio<>), typeof(Repositorio<>));
 
 var app = builder.Build();
+
+app.MapCatalogoEndpoints();
 
 app.Run();

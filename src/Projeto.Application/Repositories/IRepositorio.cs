@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace Projeto.Application;
+namespace Projeto.Application.Repositories;
 
 /// <summary>
 /// Contrato generico de acesso a dados. Fica na Application para que nenhuma camada

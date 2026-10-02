@@ -1,5 +1,5 @@
 ---
-title: "Esquema fisico MySQL - banco LojaVirtual | CP2 2TDSPB 2026.2"
+title: "Esquema fisico MySQL - banco LojaVirtual | CP2 2TDSPB 2026.2 (Produtos em TPH)"
 config:
   theme: base
   themeVariables:
@@ -54,6 +54,14 @@ erDiagram
     int           EstoqueAtual      "NOT NULL DEFAULT 0 - CHECK maior ou igual a 0"
     tinyint_1     Ativo             "NOT NULL DEFAULT TRUE"
     char_36       CategoriaId    FK "NOT NULL - ON DELETE RESTRICT"
+    varchar_20    TipoProduto       "NOT NULL - discriminador TPH: Fisico ou Digital"
+    int           PesoGramas        "NULL - obrigatorio se Fisico (CK_Produtos_Fisico)"
+    int           AlturaCm          "NULL - obrigatorio se Fisico"
+    int           LarguraCm         "NULL - obrigatorio se Fisico"
+    int           ComprimentoCm     "NULL - obrigatorio se Fisico"
+    varchar_300   UrlDownload       "NULL - obrigatorio se Digital (CK_Produtos_Digital)"
+    decimal_10_2  TamanhoArquivoMb  "NULL - obrigatorio se Digital"
+    int           LimiteDownloads   "NULL - opcional"
   }
 
   Pedidos {
@@ -78,8 +86,8 @@ erDiagram
     decimal_10_2  Subtotal          "NOT NULL - CHECK maior ou igual a 0"
   }
 
-  Clientes   ||--o| Enderecos   : "FK_Clientes_Enderecos_EnderecoId (UNIQUE)"
+  Clientes   |o--o| Enderecos   : "FK_Clientes_Enderecos_EnderecoId (UNIQUE)"
   Clientes   ||--o{ Pedidos     : "FK_Pedidos_Clientes_ClienteId"
   Categorias ||--o{ Produtos    : "FK_Produtos_Categorias_CategoriaId"
-  Pedidos    ||--|{ ItensPedido : "FK_ItensPedido_Pedidos_PedidoId"
+  Pedidos    ||--o{ ItensPedido : "FK_ItensPedido_Pedidos_PedidoId"
   Produtos   ||--o{ ItensPedido : "FK_ItensPedido_Produtos_ProdutoId"

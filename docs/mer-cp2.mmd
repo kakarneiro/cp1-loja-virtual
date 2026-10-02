@@ -1,0 +1,113 @@
+---
+title: "MER - Loja Virtual | CP2 2TDSPB 2026.2 (evolucao: hierarquia de PRODUTO)"
+config:
+  theme: base
+  themeVariables:
+    fontFamily: "arial"
+    fontSize: "14px"
+    primaryColor: "#EAF2FB"
+    primaryBorderColor: "#1F4E79"
+    primaryTextColor: "#10243A"
+    lineColor: "#1F4E79"
+  er:
+    entityPadding: 22
+    minEntityWidth: 190
+    useMaxWidth: false
+---
+erDiagram
+
+  LEGENDA_DA_NOTACAO {
+    string _1_traco_duplo        "|| exatamente 1 - participacao OBRIGATORIA"
+    string _2_traco_e_circulo    "|o zero ou um - participacao OPCIONAL"
+    string _3_pe_galinha_traco   "|{ um ou muitos - OBRIGATORIA"
+    string _4_pe_galinha_circulo "o{ zero ou muitos - OPCIONAL"
+    string _5_PK                 "chave primaria"
+    string _6_FK                 "chave estrangeira"
+    string _7_UK                 "chave unica - UNIQUE"
+    string _8_NOT_NULL           "atributo obrigatorio"
+    string _9_NULL               "atributo opcional"
+    string _10_e_um              "e_um - especializacao, total e disjunta"
+  }
+
+  CLIENTE {
+    guid     Id             PK "NOT NULL - identidade GUID"
+    varchar  NomeCompleto      "NOT NULL (120)"
+    char     Cpf            UK "NOT NULL (11) - unico"
+    varchar  Email          UK "NOT NULL (150) - unico"
+    varchar  Telefone          "NULL - opcional (20)"
+    date     DataNascimento    "NULL - opcional"
+    datetime DataCadastro      "NOT NULL"
+    boolean  Ativo             "NOT NULL - default true"
+    guid     EnderecoId  FK,UK "NULL - FK unica: garante o 1:1"
+  }
+
+  ENDERECO {
+    guid     Id             PK "NOT NULL"
+    varchar  Logradouro        "NOT NULL (150)"
+    varchar  Numero            "NOT NULL (10)"
+    varchar  Complemento       "NULL - opcional (60)"
+    varchar  Bairro            "NOT NULL (80)"
+    varchar  Cidade            "NOT NULL (80)"
+    char     Uf                "NOT NULL (2)"
+    char     Cep               "NOT NULL (8)"
+  }
+
+  CATEGORIA {
+    guid     Id             PK "NOT NULL - identidade GUID"
+    varchar  Nome           UK "NOT NULL (80) - unico"
+    varchar  Descricao         "NULL - opcional (250)"
+  }
+
+  PRODUTO {
+    guid     Id             PK "NOT NULL - identidade GUID"
+    varchar  Nome              "NOT NULL (120)"
+    varchar  Descricao         "NULL - opcional (500)"
+    varchar  CodigoBarras   UK "NOT NULL (13) - unico"
+    decimal  Preco             "NOT NULL (10,2)"
+    int      EstoqueAtual      "NOT NULL - default 0"
+    boolean  Ativo             "NOT NULL - default true"
+    guid     CategoriaId    FK "NOT NULL - obrigatorio"
+  }
+
+  PRODUTO_FISICO {
+    int      PesoGramas        "NOT NULL - para o frete"
+    int      AlturaCm          "NOT NULL"
+    int      LarguraCm         "NOT NULL"
+    int      ComprimentoCm     "NOT NULL"
+  }
+
+  PRODUTO_DIGITAL {
+    varchar  UrlDownload       "NOT NULL (300)"
+    decimal  TamanhoArquivoMb  "NOT NULL (10,2)"
+    int      LimiteDownloads   "NULL - NULL = ilimitado"
+  }
+
+  PEDIDO {
+    guid     Id             PK "NOT NULL"
+    varchar  Numero         UK "NOT NULL (20) - unico"
+    datetime DataPedido        "NOT NULL"
+    int      Status            "NOT NULL - enum StatusPedido"
+    int      FormaPagamento    "NOT NULL - enum FormaPagamento"
+    decimal  ValorTotal        "NOT NULL (10,2)"
+    decimal  Desconto          "NULL - opcional (10,2)"
+    datetime DataEntrega       "NULL - so apos a entrega"
+    varchar  Observacao        "NULL - opcional (300)"
+    guid     ClienteId      FK "NOT NULL - obrigatorio"
+  }
+
+  ITEM_PEDIDO {
+    guid     Id             PK "NOT NULL"
+    guid     PedidoId       FK "NOT NULL - obrigatorio"
+    guid     ProdutoId      FK "NOT NULL - obrigatorio"
+    int      Quantidade        "NOT NULL"
+    decimal  PrecoUnitario     "NOT NULL (10,2)"
+    decimal  Subtotal          "NOT NULL (10,2)"
+  }
+
+  CLIENTE   ||--o| ENDERECO        : "reside_em 1:1 (opcional)"
+  CLIENTE   ||--o{ PEDIDO          : "realiza 1:N"
+  CATEGORIA ||--o{ PRODUTO         : "classifica 1:N"
+  PEDIDO    ||--|{ ITEM_PEDIDO     : "contem 1:N minimo 1 (resolve N:N)"
+  PRODUTO   ||--o{ ITEM_PEDIDO     : "e_vendido_em 1:N (resolve N:N)"
+  PRODUTO   ||--o| PRODUTO_FISICO  : "e_um (especializacao)"
+  PRODUTO   ||--o| PRODUTO_DIGITAL : "e_um (especializacao)"

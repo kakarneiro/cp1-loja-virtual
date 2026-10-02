@@ -13,6 +13,8 @@ public class LojaVirtualContext : DbContext
     public DbSet<Endereco> Enderecos => Set<Endereco>();
     public DbSet<Categoria> Categorias => Set<Categoria>();
     public DbSet<Produto> Produtos => Set<Produto>();
+    public DbSet<ProdutoFisico> ProdutosFisicos => Set<ProdutoFisico>();
+    public DbSet<ProdutoDigital> ProdutosDigitais => Set<ProdutoDigital>();
     public DbSet<Pedido> Pedidos => Set<Pedido>();
     public DbSet<ItemPedido> ItensPedido => Set<ItemPedido>();
 

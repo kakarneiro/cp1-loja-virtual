@@ -15,6 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Application: contratos usados pelos endpoints. Infrastructure: so para a composicao (DI) no Program.cs. -->
+    <ProjectReference Include="..\Projeto.Application\Projeto.Application.csproj" />
     <ProjectReference Include="..\Projeto.Infrastructure\Projeto.Infrastructure.csproj" />
   </ItemGroup>
 
