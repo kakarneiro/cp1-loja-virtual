@@ -1,0 +1,85 @@
+---
+title: "Esquema fisico MySQL - banco LojaVirtual | CP2 2TDSPB 2026.2"
+config:
+  theme: base
+  themeVariables:
+    fontFamily: "arial"
+    fontSize: "14px"
+    primaryColor: "#EAF2FB"
+    primaryBorderColor: "#1F4E79"
+    primaryTextColor: "#10243A"
+    lineColor: "#1F4E79"
+  er:
+    entityPadding: 22
+    minEntityWidth: 190
+    useMaxWidth: false
+---
+erDiagram
+
+  Clientes {
+    char_36       Id             PK "NOT NULL"
+    varchar_120   NomeCompleto      "NOT NULL"
+    char_11       Cpf            UK "NOT NULL - IX_Clientes_Cpf"
+    varchar_150   Email          UK "NOT NULL - IX_Clientes_Email"
+    varchar_20    Telefone          "NULL"
+    date          DataNascimento    "NULL"
+    datetime_6    DataCadastro      "NOT NULL"
+    tinyint_1     Ativo             "NOT NULL DEFAULT TRUE"
+    char_36       EnderecoId     FK,UK "NULL - ON DELETE SET NULL"
+  }
+
+  Enderecos {
+    char_36       Id             PK "NOT NULL"
+    varchar_150   Logradouro        "NOT NULL"
+    varchar_10    Numero            "NOT NULL"
+    varchar_60    Complemento       "NULL"
+    varchar_80    Bairro            "NOT NULL"
+    varchar_80    Cidade            "NOT NULL"
+    char_2        Uf                "NOT NULL"
+    char_8        Cep               "NOT NULL"
+  }
+
+  Categorias {
+    char_36       Id             PK "NOT NULL"
+    varchar_80    Nome           UK "NOT NULL - IX_Categorias_Nome"
+    varchar_250   Descricao         "NULL"
+  }
+
+  Produtos {
+    char_36       Id             PK "NOT NULL"
+    varchar_120   Nome              "NOT NULL"
+    varchar_500   Descricao         "NULL"
+    varchar_13    CodigoBarras   UK "NOT NULL - IX_Produtos_CodigoBarras"
+    decimal_10_2  Preco             "NOT NULL - CHECK maior ou igual a 0"
+    int           EstoqueAtual      "NOT NULL DEFAULT 0 - CHECK maior ou igual a 0"
+    tinyint_1     Ativo             "NOT NULL DEFAULT TRUE"
+    char_36       CategoriaId    FK "NOT NULL - ON DELETE RESTRICT"
+  }
+
+  Pedidos {
+    char_36       Id             PK "NOT NULL"
+    varchar_20    Numero         UK "NOT NULL - IX_Pedidos_Numero"
+    datetime_6    DataPedido        "NOT NULL"
+    int           Status            "NOT NULL - enum StatusPedido"
+    int           FormaPagamento    "NOT NULL - enum FormaPagamento"
+    decimal_10_2  ValorTotal        "NOT NULL - CHECK maior ou igual a 0"
+    decimal_10_2  Desconto          "NULL - CHECK maior ou igual a 0"
+    datetime_6    DataEntrega       "NULL"
+    varchar_300   Observacao        "NULL"
+    char_36       ClienteId      FK "NOT NULL - ON DELETE RESTRICT"
+  }
+
+  ItensPedido {
+    char_36       Id             PK "NOT NULL"
+    char_36       PedidoId       FK "NOT NULL - ON DELETE CASCADE - UK com ProdutoId"
+    char_36       ProdutoId      FK "NOT NULL - ON DELETE RESTRICT - UK com PedidoId"
+    int           Quantidade        "NOT NULL - CHECK maior que 0"
+    decimal_10_2  PrecoUnitario     "NOT NULL - CHECK maior ou igual a 0"
+    decimal_10_2  Subtotal          "NOT NULL - CHECK maior ou igual a 0"
+  }
+
+  Clientes   ||--o| Enderecos   : "FK_Clientes_Enderecos_EnderecoId (UNIQUE)"
+  Clientes   ||--o{ Pedidos     : "FK_Pedidos_Clientes_ClienteId"
+  Categorias ||--o{ Produtos    : "FK_Produtos_Categorias_CategoriaId"
+  Pedidos    ||--|{ ItensPedido : "FK_ItensPedido_Pedidos_PedidoId"
+  Produtos   ||--o{ ItensPedido : "FK_ItensPedido_Produtos_ProdutoId"
